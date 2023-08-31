@@ -12,6 +12,7 @@ pandas = ">=1.4.3"
 pyarrow = ">=6.0.0"
 python = ">=3.8"
 pydantic = ">=1.0"
+requests = ">=2.20.0"
 
 [tool.poetry.dev-dependencies]
 black = "^23.3.0"
