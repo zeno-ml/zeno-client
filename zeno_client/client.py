@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 from pydantic import BaseModel
 
-DEFAULT_BACKEND = "https://api.hub.zenoml.com"
+DEFAULT_BACKEND = "https://api.zenoml.com"
 
 
 class ZenoMetric(BaseModel):
@@ -190,7 +190,7 @@ class ZenoClient:
                 "uuid": "",
                 "name": name,
                 "view": view,
-                "metrics": [m.model_dump() for m in metrics],
+                "metrics": [dict(m) for m in metrics],
                 "owner_name": "",
                 "data_url": data_url,
                 "calculate_histogram_metrics": calculate_histogram_metrics,
