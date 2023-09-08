@@ -17,12 +17,13 @@ class ZenoMetric(BaseModel):
         name (str): The name of the metric.
         type (str): The type of metric to calculate.
         columns (list[str]): The columns to calculate the metric on.
+            Empty list if not set.
     """
 
     id: int = -1
     name: str
     type: str
-    columns: List[str]
+    columns: List[str] = []
 
 
 class ZenoProject:
@@ -84,6 +85,7 @@ class ZenoProject:
             },
             files={"file": (b)},
             headers={"Authorization": "Bearer " + self.api_key},
+            verify=True,
         )
         if response.status_code == 200:
             print("Successfully uploaded data")
@@ -116,6 +118,7 @@ class ZenoProject:
             },
             files={"file": (b)},
             headers={"Authorization": "Bearer " + self.api_key},
+            verify=True,
         )
         if response.status_code == 200:
             print("Successfully uploaded system")
@@ -196,6 +199,7 @@ class ZenoClient:
                 "editor": True,
             },
             headers={"Authorization": "Bearer " + self.api_key},
+            verify=True,
         )
         if response.status_code == 200:
             print("Successfully created project ", response.text[1:-1])
@@ -229,6 +233,7 @@ class ZenoClient:
         response = requests.get(
             f"{self.endpoint}/api/project-uuid/{user}/{project_name}",
             headers={"Authorization": "Bearer " + self.api_key},
+            verify=True,
         )
         if response.status_code == 200:
             return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
