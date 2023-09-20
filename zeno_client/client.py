@@ -201,8 +201,11 @@ class ZenoClient:
             headers={"Authorization": "Bearer " + self.api_key},
             verify=True,
         )
-        if response.status_code == 200:
+        if response.status_code == 201:
             print("Successfully created project ", response.text[1:-1])
+            return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
+        elif response.status_code == 200:
+            print("Successfully updated project ", response.text[1:-1])
             return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
         else:
             raise Exception(response.json()["detail"])
