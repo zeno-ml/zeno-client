@@ -19,7 +19,7 @@ client = ZenoClient("YOUR_API_KEY")
 project = client.create_project("my_project", "my_view")
 
 # Upload a simple dataset
-df = df.load_csv("my_dataset.csv")
+df = pd.read_csv("my_dataset.csv")
 project.upload_dataset(df, id_column="id", label_column="label", data_column='text')
 
 # Upload a system to the project
