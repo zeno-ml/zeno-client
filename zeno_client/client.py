@@ -15,7 +15,7 @@ class ZenoMetric(BaseModel):
     Attributes:
         id (int): The ID of the metric. -1 if not set.
         name (str): The name of the metric.
-        type (str): The type of metric to calculate.
+        type (str): The type of metric to calculate. Currently only "mean".
         columns (list[str]): The columns to calculate the metric on.
             Empty list if not set.
     """
@@ -29,10 +29,7 @@ class ZenoMetric(BaseModel):
 class ZenoProject:
     """Provides data upload functionality for a Zeno project.
 
-    Attributes:
-        api_key (str): The API key to authenticate uploads with.
-        project_uuid (str): The ID of the project to add data to.
-        endpoint (str): The base URL of the Zeno backend.
+    Should NOT be initialized directly, but rather through the ZenoClient.
     """
 
     api_key: str
@@ -127,12 +124,7 @@ class ZenoProject:
 
 
 class ZenoClient:
-    """Client class for data upload functionality to Zeno.
-
-    Attributes:
-        api_key (str): The API key to authenticate uploads with.
-        endpoint (str): The base URL of the Zeno backend.
-    """
+    """Client class for data upload functionality to Zeno."""
 
     api_key: str
     endpoint: str
@@ -156,7 +148,7 @@ class ZenoClient:
         data_url: str = "",
         calculate_histogram_metrics: bool = True,
         samples_per_page: int = 10,
-        public: bool = True,
+        public: bool = False,
     ) -> ZenoProject:
         """Creates an empty project in Zeno's backend.
 
@@ -219,7 +211,6 @@ class ZenoClient:
         Returns:
             Project | None: The project object or None if the project could not be
                 found.
-
 
         Raises:
             HTTPError: If the project could not be found.
