@@ -26,7 +26,7 @@ df = pd.DataFrame({
     "text": ["Zeno", "of", "Elea"],
     "label": ["A", "B", "B"]
 })
-project.upload_dataset(df, id_column="id", label_column="label", data_column='text')
+project.upload_dataset(df, id_column="id", label_column="label", data_column="text")
 
 # Upload a system to the project
 # ... run inference on your model ...
