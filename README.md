@@ -19,7 +19,13 @@ client = ZenoClient("YOUR_API_KEY")
 project = client.create_project("my_project", "my_view")
 
 # Upload a simple dataset
-df = pd.read_csv("my_dataset.csv")
+# You need to provide at least an id column.
+# Your dataframe can contain additional metadata which will be usable in Zeno.
+df = pd.DataFrame({
+    "id": [1, 2, 3],
+    "text": ["Zeno", "of", "Elea"],
+    "label": ["A", "B", "B"]
+})
 project.upload_dataset(df, id_column="id", label_column="label", data_column='text')
 
 # Upload a system to the project
