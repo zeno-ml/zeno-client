@@ -58,7 +58,7 @@ class ZenoProject:
         """
         self.api_key = api_key
         self.project_uuid = project_uuid
-        self.endpoint = endpoint 
+        self.endpoint = endpoint
 
     def upload_dataset(
         self,
