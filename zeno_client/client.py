@@ -1,12 +1,22 @@
 """Functions to upload data to Zeno's backend."""
 import io
+from json import JSONDecodeError
 from typing import List, Optional
 
 import pandas as pd
 import requests
 from pydantic import BaseModel
 
+from zeno_client.exceptions import APIError
+
 DEFAULT_BACKEND = "https://api.zenoml.com"
+
+
+def _handle_error_response(response: requests.Response):
+    try:
+        raise APIError(response.json()["detail"], response.status_code)
+    except JSONDecodeError:
+        raise APIError(response.text, response.status_code)
 
 
 class ZenoMetric(BaseModel):
@@ -48,7 +58,7 @@ class ZenoProject:
         """
         self.api_key = api_key
         self.project_uuid = project_uuid
-        self.endpoint = endpoint
+        self.endpoint = endpoint 
 
     def upload_dataset(
         self,
@@ -68,7 +78,7 @@ class ZenoProject:
                 raw data. Only works for small text data. Defaults to None.
         """
         if len(id_column) == 0:
-            raise Exception("ERROR: id_column name must be non-empty")
+            raise ValueError("ERROR: id_column name must be non-empty")
 
         b = io.BytesIO()
         df.to_feather(b)
@@ -87,7 +97,7 @@ class ZenoProject:
         if response.status_code == 200:
             print("Successfully uploaded data")
         else:
-            raise Exception(response.json()["detail"])
+            _handle_error_response(response)
 
     def upload_system(
         self, system_name: str, df: pd.DataFrame, output_column: str, id_column: str
@@ -101,7 +111,7 @@ class ZenoProject:
             id_column (str): The name of the column containing the instance IDs.
         """
         if len(system_name) == 0 or len(output_column) == 0:
-            raise Exception("System_name and output_column must be non-empty.")
+            raise ValueError("System_name and output_column must be non-empty.")
 
         b = io.BytesIO()
         df.to_feather(b)
@@ -120,7 +130,7 @@ class ZenoProject:
         if response.status_code == 200:
             print("Successfully uploaded system")
         else:
-            raise Exception(response.json()["detail"])
+            _handle_error_response(response)
 
 
 class ZenoClient:
@@ -174,7 +184,7 @@ class ZenoClient:
 
         Raises:
             ValidationError: If the config does not match the ProjectConfig schema.
-            HTTPError: If the project could not be created.
+            APIError: If the project could not be created.
         """
         response = requests.post(
             f"{self.endpoint}/api/project",
@@ -200,7 +210,7 @@ class ZenoClient:
             print("Successfully updated project ", response.text[1:-1])
             return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
         else:
-            raise Exception(response.json()["detail"])
+            _handle_error_response(response)
 
     def get_project(self, project_name: str) -> ZenoProject:
         """Get a project object by its name. Names are split into owner/project_name.
@@ -213,7 +223,7 @@ class ZenoClient:
                 found.
 
         Raises:
-            HTTPError: If the project could not be found.
+            APIError: If the project could not be found.
         """
         # Get owner and project name from project_name.
         # If no owner, assume current user.
@@ -232,4 +242,4 @@ class ZenoClient:
         if response.status_code == 200:
             return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
         else:
-            raise Exception(response.json()["detail"])
+            _handle_error_response(response)
