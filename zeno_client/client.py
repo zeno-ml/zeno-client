@@ -87,7 +87,7 @@ class ZenoProject:
         if response.status_code == 200:
             print("Successfully uploaded data")
         else:
-            raise Exception(response.json()["detail"])
+            raise Exception(response.text)
 
     def upload_system(
         self, system_name: str, df: pd.DataFrame, output_column: str, id_column: str
@@ -120,7 +120,7 @@ class ZenoProject:
         if response.status_code == 200:
             print("Successfully uploaded system")
         else:
-            raise Exception(response.json()["detail"])
+            raise Exception(response.text)
 
 
 class ZenoClient:
@@ -200,7 +200,7 @@ class ZenoClient:
             print("Successfully updated project ", response.text[1:-1])
             return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
         else:
-            raise Exception(response.json()["detail"])
+            raise Exception(response.text)
 
     def get_project(self, project_name: str) -> ZenoProject:
         """Get a project object by its name. Names are split into owner/project_name.
@@ -232,4 +232,4 @@ class ZenoClient:
         if response.status_code == 200:
             return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
         else:
-            raise Exception(response.json()["detail"])
+            raise Exception(response.text)
