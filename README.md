@@ -14,9 +14,9 @@ import pandas as pd
 # Create a Zeno client with your API key
 client = ZenoClient("YOUR_API_KEY")
 
-# Create a project with a specific data renderer.
+# Create a project with a specific data renderer, e.g. "text-classification" or "image-classification"
 # See view options at https://zenoml.com/docs/views/
-project = client.create_project("my_project", "my_view")
+project = client.create_project("my_project", "text-classification")
 
 # Upload a simple dataset
 # You need to provide at least an id column.
