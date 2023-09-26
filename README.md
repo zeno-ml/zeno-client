@@ -14,10 +14,13 @@ import pandas as pd
 # Create a Zeno client with your API key
 client = ZenoClient("YOUR_API_KEY")
 
-# Create a project with a specific data renderer.
+# Create a project with a specific data renderer, e.g. "text-classification" or "image-classification"
 # See view options at https://zenoml.com/docs/views/
-project = client.create_project("my_project", "my_view")
-
+project = zeno_client.create_project(
+    "test project", 
+    view="text-classification",
+    metrics=[ZenoMetric(name="accuracy", type="mean", columns=["correct"])]
+)
 # Upload a simple dataset
 # You need to provide at least an id column.
 # Your dataframe can contain additional metadata which will be usable in Zeno.
@@ -30,8 +33,9 @@ project.upload_dataset(df, id_column="id", label_column="label", data_column="te
 
 # Upload a system to the project
 # ... run inference on your model ...
-df = pd.DataFrame({"id": [1, 2, 3], "output": ["A", "B", "A"]})
-project.upload_system("my_system", df, output_column="output", id_column="id")
+df_out = pd.DataFrame({"id": [1, 2, 3], "output": ["A", "B", "A"]})
+df_out['correct'] = df_out['output'] == df['label']
+project.upload_system("System A", df_out, output_column="output", id_column="id")
 ```
 
 See the [examples](./examples) directory for more in-depth examples.
