@@ -72,6 +72,8 @@ class ZenoProject:
         Args:
             df (pd.DataFrame): The dataset to upload.
             id_column (str): The name of the column containing the instance IDs.
+                These can either be unique IDs, URLs to hosted data, or URL pars in
+                combination with a project's endpoint.
             label_column (str | None, optional): The name of the column containing the
                 instance labels. Defaults to None.
             data_column (str | None, optional): The name of the column containing the
@@ -169,7 +171,7 @@ class ZenoClient:
             view (str): The view to use for the project.
             metrics (list[ZenoMetric], optional): The metrics to calculate for the
                 project. Defaults to [].
-            data_url (str, optional): The URL to the data to use for the project.
+            data_url (str, optional): The base URL to load datapoints from.
                 Defaults to "".
             calculate_histogram_metrics (bool, optional): Whether to calculate histogram
                 metrics. Defaults to True.
