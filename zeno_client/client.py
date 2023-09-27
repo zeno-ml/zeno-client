@@ -205,12 +205,27 @@ class ZenoClient:
             headers={"Authorization": "Bearer " + self.api_key},
             verify=True,
         )
+
+        zeno_hub = "[YOUR ZENO HUB URL]"
+        if self.endpoint == DEFAULT_BACKEND:
+            zeno_hub = "https://hub.zenoml.com"
+
         if response.status_code == 201:
-            print("Successfully created project ", response.text[1:-1])
-            return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
+            response = response.json()
+            print("Successfully created project ", response["uuid"])
+            print(
+                "To access your project, go to ",
+                zeno_hub + "/project/" + response["ownerName"] + "/" + response["name"],
+            )
+            return ZenoProject(self.api_key, response["uuid"], self.endpoint)
         elif response.status_code == 200:
-            print("Successfully updated project ", response.text[1:-1])
-            return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
+            response = response.json()
+            print("Successfully updated project ", response["uuid"])
+            print(
+                "To access your project, go to ",
+                zeno_hub + "/project/" + response["ownerName"] + "/" + response["name"],
+            )
+            return ZenoProject(self.api_key, response["uuid"], self.endpoint)
         else:
             _handle_error_response(response)
 
