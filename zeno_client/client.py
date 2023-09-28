@@ -161,6 +161,7 @@ class ZenoClient:
         calculate_histogram_metrics: bool = True,
         samples_per_page: int = 10,
         public: bool = False,
+        description: str = "",
     ) -> ZenoProject:
         """Creates an empty project in Zeno's backend.
 
@@ -178,7 +179,7 @@ class ZenoClient:
             samples_per_page (int, optional): The number of samples to show per page.
                 Defaults to 10.
             public (bool, optional): Whether the project is public. Defaults to False.
-
+            description (str, optional): The description of the project. Defaults to "".
 
         Returns:
             ZenoProject | None: The created project object or None if the project could
@@ -201,6 +202,7 @@ class ZenoClient:
                 "samplesPerPage": samples_per_page,
                 "public": public,
                 "editor": True,
+                "description": description,
             },
             headers={"Authorization": "Bearer " + self.api_key},
             verify=True,
