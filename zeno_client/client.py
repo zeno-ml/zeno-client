@@ -72,7 +72,7 @@ class ZenoProject:
         Args:
             df (pd.DataFrame): The dataset to upload.
             id_column (str): The name of the column containing the instance IDs.
-                These can either be unique IDs, URLs to hosted data, or URL pars in
+                These can either be unique IDs, URLs to hosted data, or URL parts in
                 combination with a project's endpoint.
             label_column (str | None, optional): The name of the column containing the
                 instance labels. Defaults to None.
