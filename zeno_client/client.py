@@ -4,7 +4,9 @@ from json import JSONDecodeError
 from typing import List, Optional
 
 import pandas as pd
+import pyarrow as pa
 import requests
+import tqdm.auto as tqdm
 from pydantic import BaseModel
 
 from zeno_client.exceptions import APIError
@@ -64,8 +66,9 @@ class ZenoProject:
         self,
         df: pd.DataFrame,
         id_column: str,
-        label_column: Optional[str] = None,
-        data_column: Optional[str] = None,
+        label_column: Optional[str] = "",
+        data_column: Optional[str] = "",
+        url_column: Optional[str] = "",
     ):
         """Upload a dataset to a Zeno project.
 
@@ -82,37 +85,60 @@ class ZenoProject:
         if len(id_column) == 0:
             raise ValueError("ERROR: id_column name must be non-empty")
 
-        b = io.BytesIO()
-        df.to_feather(b)
-        b.seek(0)
+        pa_table = pa.Table.from_pandas(df)
+
         response = requests.post(
-            f"{self.endpoint}/api/dataset/{self.project_uuid}",
-            data={
+            f"{self.endpoint}/api/dataset-schema",
+            json={
+                "project_uuid": self.project_uuid,
+                "columns": pa_table.column_names,
                 "id_column": id_column,
-                "label_column": label_column if label_column is not None else "",
-                "data_column": data_column if data_column is not None else "",
+                "label_column": label_column,
+                "data_column": data_column,
+                "url_column": url_column,
             },
-            files={"file": (b)},
             headers={"Authorization": "Bearer " + self.api_key},
             verify=True,
         )
-        if response.status_code == 200:
-            print("Successfully uploaded data")
-        else:
-            _handle_error_response(response)
+
+        column_names = response.json()
+        pa_table = pa_table.rename_columns(column_names)
+
+        # batches < 1MB, limit for spooling to memory in FastAPI
+        batches = pa_table.to_batches(
+            max_chunksize=1000000 / pa_table.slice(0, 1).nbytes
+        )
+        for batch in tqdm.tqdm(batches):
+            sink = io.BytesIO()
+            with pa.ipc.new_file(sink, batch.schema) as writer:
+                writer.write_batch(batch)
+
+            sink.seek(0)
+            requests.post(
+                f"{self.endpoint}/api/dataset/{self.project_uuid}",
+                files={"file": (sink)},
+                headers={
+                    "Authorization": "Bearer " + self.api_key,
+                },
+                verify=True,
+            )
+            if response.status_code != 200:
+                _handle_error_response(response)
+
+        print("Successfully uploaded data")
 
     def upload_system(
-        self, system_name: str, df: pd.DataFrame, output_column: str, id_column: str
+        self, name: str, df: pd.DataFrame, id_column: str, output_column: str
     ):
         """Upload a system to a Zeno project.
 
         Args:
+            name (str): The name of the system to upload.
             df (pd.DataFrame): The dataset to upload.
-            system_name (str): The name of the system to upload.
             output_column (str): The name of the column containing the system output.
             id_column (str): The name of the column containing the instance IDs.
         """
-        if len(system_name) == 0 or len(output_column) == 0:
+        if len(name) == 0 or len(output_column) == 0:
             raise ValueError("System_name and output_column must be non-empty.")
 
         b = io.BytesIO()
@@ -121,7 +147,7 @@ class ZenoProject:
         response = requests.post(
             f"{self.endpoint}/api/system/{self.project_uuid}",
             data={
-                "system_name": system_name,
+                "system_name": name,
                 "output_column": output_column,
                 "id_column": id_column,
             },
