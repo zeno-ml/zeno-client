@@ -1,13 +1,15 @@
 """Functions to upload data to Zeno's backend."""
 import io
+from importlib.metadata import version as package_version
 from json import JSONDecodeError
 from typing import List, Optional
 
 import pandas as pd
 import requests
+from packaging import version
 from pydantic import BaseModel
 
-from zeno_client.exceptions import APIError
+from zeno_client.exceptions import APIError, ClientVersionError
 
 DEFAULT_BACKEND = "https://api.zenoml.com"
 
@@ -149,6 +151,21 @@ class ZenoClient:
             endpoint (str, optional): the base URL of the Zeno backend.
                 Defaults to DEFAULT_BACKEND.
         """
+        response = requests.get(
+            endpoint + "/api/min-client-version",
+            headers={"Authorization": "Bearer " + api_key},
+            verify=True,
+        )
+        if response.status_code == 200:
+            response = response.text.replace('"', "")
+            if version.parse(response) > version.parse(package_version("zeno-client")):
+                raise ClientVersionError(
+                    f"Please upgrade your zeno-client package to version {response} or "
+                    "higher"
+                )
+        else:
+            _handle_error_response(response)
+
         self.api_key = api_key
         self.endpoint = endpoint
 
