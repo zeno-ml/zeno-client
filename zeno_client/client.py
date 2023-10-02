@@ -1,5 +1,6 @@
 """Functions to upload data to Zeno's backend."""
 import io
+from importlib.metadata import version as package_version
 from json import JSONDecodeError
 from typing import List, Optional
 
@@ -7,9 +8,10 @@ import pandas as pd
 import pyarrow as pa
 import requests
 import tqdm.auto as tqdm
+from packaging import version
 from pydantic import BaseModel
 
-from zeno_client.exceptions import APIError
+from zeno_client.exceptions import APIError, ClientVersionError
 
 DEFAULT_BACKEND = "https://api.zenoml.com"
 
@@ -75,7 +77,7 @@ class ZenoProject:
         Args:
             df (pd.DataFrame): The dataset to upload.
             id_column (str): The name of the column containing the instance IDs.
-                These can either be unique IDs, URLs to hosted data, or URL pars in
+                These can either be unique IDs, URLs to hosted data, or URL parts in
                 combination with a project's endpoint.
             label_column (str | None, optional): The name of the column containing the
                 instance labels. Defaults to None.
@@ -175,6 +177,21 @@ class ZenoClient:
             endpoint (str, optional): the base URL of the Zeno backend.
                 Defaults to DEFAULT_BACKEND.
         """
+        response = requests.get(
+            endpoint + "/api/min-client-version",
+            headers={"Authorization": "Bearer " + api_key},
+            verify=True,
+        )
+        if response.status_code == 200:
+            response = response.text.replace('"', "")
+            if version.parse(response) > version.parse(package_version("zeno-client")):
+                raise ClientVersionError(
+                    f"Please upgrade your zeno-client package to version {response} or "
+                    "higher"
+                )
+        else:
+            _handle_error_response(response)
+
         self.api_key = api_key
         self.endpoint = endpoint
 
@@ -187,6 +204,7 @@ class ZenoClient:
         calculate_histogram_metrics: bool = True,
         samples_per_page: int = 10,
         public: bool = False,
+        description: str = "",
     ) -> ZenoProject:
         """Creates an empty project in Zeno's backend.
 
@@ -204,7 +222,7 @@ class ZenoClient:
             samples_per_page (int, optional): The number of samples to show per page.
                 Defaults to 10.
             public (bool, optional): Whether the project is public. Defaults to False.
-
+            description (str, optional): The description of the project. Defaults to "".
 
         Returns:
             ZenoProject | None: The created project object or None if the project could
@@ -227,6 +245,7 @@ class ZenoClient:
                 "samplesPerPage": samples_per_page,
                 "public": public,
                 "editor": True,
+                "description": description,
             },
             headers={"Authorization": "Bearer " + self.api_key},
             verify=True,
