@@ -76,7 +76,7 @@ class ZenoProject:
         Args:
             df (pd.DataFrame): The dataset to upload as a Pandas DataFrame.
             id_column (str): Column name containing unique instance IDs.
-            data_column (str | None, optional): Column containing the
+            data_column (str): Column containing the
                 instance data. This can be raw data for data types such as
                 text, or URLs for large media data such as images and videos.
             label_column (str | None, optional): Column containing the
