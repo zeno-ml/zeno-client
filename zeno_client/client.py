@@ -112,14 +112,14 @@ class ZenoProject:
         pa_table = pa.Table.from_pandas(df)
 
         response = requests.post(
-            f"{self.endpoint}/api/dataset-schema",
-            json={
+            f"{self.endpoint}/api/dataset-schema/",
+            data={
                 "project_uuid": self.project_uuid,
-                "columns": pa_table.column_names,
                 "id_column": id_column,
                 "data_column": data_column,
                 "label_column": label_column,
             },
+            files={"file": (pa_table.schema.serialize().to_pybytes())},
             headers={"Authorization": "Bearer " + self.api_key},
             verify=True,
         )
@@ -130,7 +130,7 @@ class ZenoProject:
 
         # batches < 1MB, limit for spooling to memory in FastAPI
         batches = pa_table.to_batches(
-            max_chunksize=1000000 / pa_table.slice(0, 1).nbytes
+            max_chunksize=900000 / pa_table.slice(0, 1).nbytes
         )
         for batch in tqdm.tqdm(batches):
             sink = io.BytesIO()
@@ -186,23 +186,25 @@ class ZenoProject:
 
         response = requests.post(
             f"{self.endpoint}/api/system-schema",
-            json={
+            data={
                 "project_uuid": self.project_uuid,
                 "system_name": name,
-                "columns": pa_table.column_names,
                 "id_column": id_column,
                 "output_column": output_column,
             },
+            files={"file": (pa_table.schema.serialize().to_pybytes())},
             headers={"Authorization": "Bearer " + self.api_key},
             verify=True,
         )
+        if response.status_code != 200:
+            _handle_error_response(response)
 
         column_names = response.json()
         pa_table = pa_table.rename_columns(column_names)
 
         # batches < 1MB, limit for spooling to memory in FastAPI
         batches = pa_table.to_batches(
-            max_chunksize=1000000 / pa_table.slice(0, 1).nbytes
+            max_chunksize=900000 / pa_table.slice(0, 1).nbytes
         )
         for batch in tqdm.tqdm(batches):
             sink = io.BytesIO()
