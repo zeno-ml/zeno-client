@@ -109,10 +109,10 @@ class ZenoProject:
         object_columns = df.select_dtypes(include=["object"]).columns
         df[object_columns] = df[object_columns].astype(str)
 
-        pa_table = pa.Table.from_pandas(df)
+        pa_table = pa.Table.from_pandas(df, preserve_index=False)
 
         response = requests.post(
-            f"{self.endpoint}/api/dataset-schema/",
+            f"{self.endpoint}/api/dataset-schema",
             data={
                 "project_uuid": self.project_uuid,
                 "id_column": id_column,
@@ -184,7 +184,7 @@ class ZenoProject:
         object_columns = df.select_dtypes(include=["object"]).columns
         df[object_columns] = df[object_columns].astype(str)
 
-        pa_table = pa.Table.from_pandas(df)
+        pa_table = pa.Table.from_pandas(df, preserve_index=False)
 
         response = requests.post(
             f"{self.endpoint}/api/system-schema",
