@@ -67,6 +67,7 @@ class ZenoProject:
     def upload_dataset(
         self,
         df: pd.DataFrame,
+        *,
         id_column: str,
         data_column: str,
         label_column: Optional[str] = "",
@@ -154,13 +155,13 @@ class ZenoProject:
         print("Successfully uploaded data")
 
     def upload_system(
-        self, name: str, df: pd.DataFrame, id_column: str, output_column: str
+        self, df: pd.DataFrame, *, name: str, id_column: str, output_column: str
     ):
         """Upload a system to a Zeno project.
 
         Args:
-            name (str): The name of the system to upload.
             df (pd.DataFrame): The dataset to upload.
+            name (str): The name of the system to upload.
             id_column (str): The name of the column containing the instance IDs.
             output_column (str): The name of the column containing the system output.
         """
@@ -234,7 +235,7 @@ class ZenoClient:
     api_key: str
     endpoint: str
 
-    def __init__(self, api_key, endpoint=DEFAULT_BACKEND) -> None:
+    def __init__(self, api_key: str, *, endpoint: str = DEFAULT_BACKEND) -> None:
         """Initialize the ZenoClient object for API upload calls.
 
         Args:
@@ -262,6 +263,7 @@ class ZenoClient:
 
     def create_project(
         self,
+        *,
         name: str,
         view: str,
         metrics: List[ZenoMetric] = [],
