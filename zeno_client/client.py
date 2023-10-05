@@ -104,11 +104,11 @@ class ZenoProject:
             raise ValueError("ERROR: label_column not found in dataframe")
 
         # Cast id_column to string to avoid issues with numeric IDs in database
-        df[id_column] = df[id_column].astype(str)
+        df.loc[:, id_column] = df[id_column].astype(str)
 
         # Cast all object columns to string
         object_columns = df.select_dtypes(include=["object"]).columns
-        df[object_columns] = df[object_columns].astype(str)
+        df.loc[:, object_columns] = df[object_columns].astype(str)
 
         pa_table = pa.Table.from_pandas(df, preserve_index=False)
 
@@ -179,11 +179,11 @@ class ZenoProject:
             raise ValueError("ERROR: output_column not found in dataframe")
 
         # Cast id_column to string to avoid issues with numeric IDs in database
-        df[id_column] = df[id_column].astype(str)
+        df.loc[:, id_column] = df[id_column].astype(str)
 
         # Cast all object columns to string
         object_columns = df.select_dtypes(include=["object"]).columns
-        df[object_columns] = df[object_columns].astype(str)
+        df.loc[:, object_columns] = df[object_columns].astype(str)
 
         pa_table = pa.Table.from_pandas(df, preserve_index=False)
 
