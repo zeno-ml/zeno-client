@@ -235,7 +235,7 @@ class ZenoClient:
     api_key: str
     endpoint: str
 
-    def __init__(self, api_key: str, *, endpoint: str = DEFAULT_BACKEND) -> None:
+    def __init__(self, api_key: str, endpoint: str = DEFAULT_BACKEND) -> None:
         """Initialize the ZenoClient object for API upload calls.
 
         Args:
@@ -263,8 +263,8 @@ class ZenoClient:
 
     def create_project(
         self,
-        *,
         name: str,
+        *,
         view: str,
         metrics: List[ZenoMetric] = [],
         data_url: str = "",
