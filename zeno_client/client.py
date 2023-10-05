@@ -70,7 +70,7 @@ class ZenoProject:
         *,
         id_column: str,
         data_column: str,
-        label_column: Optional[str] = "",
+        label_column: Optional[str] = None,
     ):
         """Upload a dataset to a Zeno project.
 
