@@ -1,8 +1,10 @@
 """Functions to upload data to Zeno's backend."""
 import io
+import re
 from importlib.metadata import version as package_version
 from json import JSONDecodeError
 from typing import List, Optional
+from urllib.parse import quote
 
 import pandas as pd
 import pyarrow as pa
@@ -165,6 +167,11 @@ class ZenoProject:
             id_column (str): The name of the column containing the instance IDs.
             output_column (str): The name of the column containing the system output.
         """
+        if name == "":
+            raise ValueError("System name cannot be empty")
+        if re.findall("[/]", name):
+            raise ValueError("System name cannot contain a '/'.")
+
         if id_column == output_column:
             raise ValueError(
                 "ERROR: column names must be unique."
@@ -215,6 +222,7 @@ class ZenoProject:
                 writer.write_batch(batch)
 
             sink.seek(0)
+            name = quote(name, safe="!~*'()")
             response = requests.post(
                 f"{self.endpoint}/api/system/{self.project_uuid}/{name}",
                 files={"file": (sink)},
@@ -299,6 +307,10 @@ class ZenoClient:
             ValidationError: If the config does not match the ProjectConfig schema.
             APIError: If the project could not be created.
         """
+        if name == "":
+            raise ValueError("Project name cannot be empty")
+        if re.findall("[/]", name):
+            raise ValueError("Project name cannot contain a '/'.")
         response = requests.post(
             f"{self.endpoint}/api/project",
             json={
