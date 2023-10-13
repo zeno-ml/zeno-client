@@ -274,12 +274,10 @@ class ZenoClient:
         *,
         name: str,
         view: str,
+        description: str = "",
         metrics: List[ZenoMetric] = [],
-        data_url: str = "",
-        calculate_histogram_metrics: bool = True,
         samples_per_page: int = 10,
         public: bool = False,
-        description: str = "",
     ) -> ZenoProject:
         """Creates an empty project in Zeno's backend.
 
@@ -288,16 +286,12 @@ class ZenoClient:
                 created under the current user, e.g. username/name.
                 project: str,
             view (str): The view to use for the project.
+            description (str, optional): The description of the project. Defaults to "".
             metrics (list[ZenoMetric], optional): The metrics to calculate for the
                 project. Defaults to [].
-            data_url (str, optional): The base URL to load datapoints from.
-                Defaults to "".
-            calculate_histogram_metrics (bool, optional): Whether to calculate histogram
-                metrics. Defaults to True.
             samples_per_page (int, optional): The number of samples to show per page.
                 Defaults to 10.
             public (bool, optional): Whether the project is public. Defaults to False.
-            description (str, optional): The description of the project. Defaults to "".
 
         Returns:
             ZenoProject | None: The created project object or None if the project could
@@ -319,8 +313,6 @@ class ZenoClient:
                 "view": view,
                 "metrics": [dict(m) for m in metrics],
                 "owner_name": "",
-                "data_url": data_url,
-                "calculate_histogram_metrics": calculate_histogram_metrics,
                 "samplesPerPage": samples_per_page,
                 "public": public,
                 "editor": True,
