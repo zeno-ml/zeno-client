@@ -256,6 +256,18 @@ class ZenoProject:
 
         print("Successfully deleted system")
 
+    def delete_all_systems(self):
+        """Delete all systems from a Zeno project."""
+        response = requests.delete(
+            f"{self.endpoint}/api/systems/{self.project_uuid}",
+            headers={"Authorization": "Bearer " + self.api_key},
+            verify=True,
+        )
+        if response.status_code != 200:
+            _handle_error_response(response)
+
+        print("Successfully deleted all systems")
+
 
 class ZenoClient:
     """Client class for data upload functionality to Zeno."""
