@@ -1,6 +1,7 @@
 """Functions to upload data to Zeno's backend."""
 import io
 import re
+import urllib
 from importlib.metadata import version as package_version
 from json import JSONDecodeError
 from typing import List, Optional
@@ -360,22 +361,21 @@ class ZenoClient:
 
         if response.status_code == 201:
             response = response.json()
-            print("Successfully created project ", response["uuid"])
-            print(
-                "To access your project, go to ",
-                zeno_hub + "/project/" + response["ownerName"] + "/" + response["name"],
-            )
-            return ZenoProject(self.api_key, response["uuid"], self.endpoint)
+            print("Successfully created project.")
         elif response.status_code == 200:
             response = response.json()
-            print("Successfully updated project ", response["uuid"])
-            print(
-                "To access your project, go to ",
-                zeno_hub + "/project/" + response["ownerName"] + "/" + response["name"],
-            )
-            return ZenoProject(self.api_key, response["uuid"], self.endpoint)
+            print("Successfully updated project.")
         else:
             _handle_error_response(response)
+        print(
+            "Access your project at ",
+            zeno_hub
+            + "/project/"
+            + urllib.parse.quote(response["ownerName"])
+            + "/"
+            + urllib.parse.quote(response["name"]),
+        )
+        return ZenoProject(self.api_key, response["uuid"], self.endpoint)
 
     def get_project(self, project_name: str) -> ZenoProject:
         """Get a project object by its name. Names are split into owner/project_name.
