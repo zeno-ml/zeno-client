@@ -72,7 +72,7 @@ class ZenoProject:
         df: pd.DataFrame,
         *,
         id_column: str,
-        data_column: str,
+        data_column: Optional[str] = None,
         label_column: Optional[str] = None,
     ):
         """Upload a dataset to a Zeno project.
@@ -80,7 +80,7 @@ class ZenoProject:
         Args:
             df (pd.DataFrame): The dataset to upload as a Pandas DataFrame.
             id_column (str): Column name containing unique instance IDs.
-            data_column (str): Column containing the
+            data_column (str | None, optional): Column containing the
                 instance data. This can be raw data for data types such as
                 text, or URLs for large media data such as images and videos.
             label_column (str | None, optional): Column containing the
@@ -89,7 +89,7 @@ class ZenoProject:
         if (
             id_column == label_column
             or id_column == data_column
-            or label_column == data_column
+            or (label_column == data_column and label_column is not None)
         ):
             raise ValueError(
                 "ERROR: ID, data, and label column names must be unique."
@@ -100,7 +100,7 @@ class ZenoProject:
         if id_column not in df.columns:
             raise ValueError("ERROR: id_column not found in dataframe")
 
-        if data_column not in df.columns:
+        if data_column and data_column not in df.columns:
             raise ValueError("ERROR: data_column not found in dataframe")
 
         if label_column and label_column not in df.columns:
@@ -306,7 +306,7 @@ class ZenoClient:
         self,
         *,
         name: str,
-        view: str,
+        view: str = "tabular",
         description: str = "",
         metrics: List[ZenoMetric] = [],
         samples_per_page: int = 10,
@@ -317,8 +317,7 @@ class ZenoClient:
         Args:
             name (str): The name of the project to be created. The project will be
                 created under the current user, e.g. username/name.
-                project: str,
-            view (str): The view to use for the project.
+            view (str): The view to use for the project. Defaults to "tabular"
             description (str, optional): The description of the project. Defaults to "".
             metrics (list[ZenoMetric], optional): The metrics to calculate for the
                 project. Defaults to [].
