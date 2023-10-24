@@ -306,7 +306,7 @@ class ZenoClient:
         self,
         *,
         name: str,
-        view: str = "tabular",
+        view: str = "",
         description: str = "",
         metrics: List[ZenoMetric] = [],
         samples_per_page: int = 10,
@@ -317,7 +317,7 @@ class ZenoClient:
         Args:
             name (str): The name of the project to be created. The project will be
                 created under the current user, e.g. username/name.
-            view (str): The view to use for the project. Defaults to "tabular"
+            view (str, optional): The view to use for the project. Defaults to "".
             description (str, optional): The description of the project. Defaults to "".
             metrics (list[ZenoMetric], optional): The metrics to calculate for the
                 project. Defaults to [].
