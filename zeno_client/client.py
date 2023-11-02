@@ -15,6 +15,7 @@ from packaging import version
 from pydantic import BaseModel
 
 from zeno_client.exceptions import APIError, ClientVersionError
+from zeno_client.util import df_to_pa
 
 DEFAULT_BACKEND = "https://api.zenoml.com"
 
@@ -106,14 +107,7 @@ class ZenoProject:
         if label_column and label_column not in df.columns:
             raise ValueError("ERROR: label_column not found in dataframe")
 
-        # Cast id_column to string to avoid issues with numeric IDs in database
-        df.loc[:, id_column] = df[id_column].astype(str)
-
-        # Cast all object columns to string
-        object_columns = df.select_dtypes(include=["object"]).columns
-        df.loc[:, object_columns] = df[object_columns].astype(str)
-
-        pa_table = pa.Table.from_pandas(df, preserve_index=False)
+        pa_table = df_to_pa(df, id_column)
 
         response = requests.post(
             f"{self.endpoint}/api/dataset-schema",
@@ -186,14 +180,7 @@ class ZenoProject:
         if output_column not in df.columns:
             raise ValueError("ERROR: output_column not found in dataframe")
 
-        # Cast id_column to string to avoid issues with numeric IDs in database
-        df.loc[:, id_column] = df[id_column].astype(str)
-
-        # Cast all object columns to string
-        object_columns = df.select_dtypes(include=["object"]).columns
-        df.loc[:, object_columns] = df[object_columns].astype(str)
-
-        pa_table = pa.Table.from_pandas(df, preserve_index=False)
+        pa_table = df_to_pa(df, id_column)
 
         response = requests.post(
             f"{self.endpoint}/api/system-schema",
@@ -377,30 +364,23 @@ class ZenoClient:
         )
         return ZenoProject(self.api_key, response["uuid"], self.endpoint)
 
-    def get_project(self, project_name: str) -> ZenoProject:
-        """Get a project object by its name. Names are split into owner/project_name.
+    def get_project(self, owner_name: str, project_name: str) -> ZenoProject:
+        """Get a project object by its owner and name.
 
         Args:
-            project_name (str): The owner/project_name of the project to get.
+            owner_name (str): The owner of the project to get.
+            project_name (str): The name of the project to get.
 
         Returns:
-            Project | None: The project object or None if the project could not be
-                found.
+            Project: The project object.
 
         Raises:
             APIError: If the project could not be found.
         """
-        # Get owner and project name from project_name.
-        # If no owner, assume current user.
-        split_project_name = project_name.split("/")
-        if len(split_project_name) == 1:
-            raise Exception("Project name must be in the format owner/project_name")
-        else:
-            user = split_project_name[0]
-            project_name = split_project_name[1]
-
+        user = quote(owner_name, safe="!~*'()")
+        project = quote(project_name, safe="!~*'()")
         response = requests.get(
-            f"{self.endpoint}/api/project-uuid/{user}/{project_name}",
+            f"{self.endpoint}/api/project-uuid/{user}/{project}",
             headers={"Authorization": "Bearer " + self.api_key},
             verify=True,
         )
