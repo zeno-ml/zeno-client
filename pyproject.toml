@@ -14,6 +14,7 @@ python = ">=3.8"
 pydantic = ">=1.0"
 requests = ">=2.20.0"
 arrow-json = "^0.9.0"
+outdated = "^0.2.2"
 
 [tool.poetry.dev-dependencies]
 pyright = "^1.1.320"

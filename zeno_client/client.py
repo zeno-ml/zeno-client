@@ -9,9 +9,11 @@ from typing import Dict, List, Optional, Union
 from urllib.parse import quote
 
 import pandas as pd
+import pkg_resources
 import pyarrow as pa
 import requests
 import tqdm.auto as tqdm
+from outdated import warn_if_outdated
 from packaging import version
 from pydantic import BaseModel
 
@@ -290,6 +292,10 @@ class ZenoClient:
                 )
         else:
             _handle_error_response(response)
+
+        warn_if_outdated(
+            "zeno-client", pkg_resources.get_distribution("zeno-client").version
+        )
 
         self.api_key = api_key
         self.endpoint = endpoint
