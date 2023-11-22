@@ -375,9 +375,9 @@ class ZenoClient:
             "Access your project at ",
             zeno_hub
             + "/project/"
-            + urllib.parse.quote(response["ownerName"])
+            + urllib.parse.quote(response["uuid"])
             + "/"
-            + urllib.parse.quote(response["name"]),
+            + urllib.parse.quote(name),
         )
         return ZenoProject(self.api_key, response["uuid"], self.endpoint)
 
