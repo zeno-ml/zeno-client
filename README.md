@@ -18,3 +18,4 @@ Then, in GitHub, click on "Releases" and "Draft a new Release".
 From here click on "tag" and create a new tag of the form `vX.X.X` for your new version.
 Make the release title the same as the tag.
 Click "Generate release notes", and publish the release.
+GitHub will start an action to push the new package to PyPI
