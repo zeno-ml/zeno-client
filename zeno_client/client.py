@@ -304,7 +304,7 @@ class ZenoClient:
         self,
         *,
         name: str,
-        view: Union[str, Dict] = "",
+        view: Union[Dict, None] = None,
         description: str = "",
         metrics: List[ZenoMetric] = [],
         samples_per_page: int = 10,
@@ -315,8 +315,8 @@ class ZenoClient:
         Args:
             name (str): The name of the project to be created. The project will be
                 created under the current user, e.g. username/name.
-            view (Union[str, Dict], optional): The view to use for the project.
-                Defaults to "".
+            view (Union[str, None], optional): The view to use for the project.
+                Defaults to None.
             description (str, optional): The description of the project. Defaults to "".
             metrics (list[ZenoMetric], optional): The metrics to calculate for the
                 project. Defaults to [].
@@ -338,8 +338,9 @@ class ZenoClient:
         if re.findall("[/]", name):
             raise ValueError("Project name cannot contain a '/'.")
 
-        # if view is dict, dump to json
-        if isinstance(view, dict):
+        if view is None:
+            view = ""
+        else:
             view = json.dumps(view)
 
         response = requests.post(
