@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zeno-client"
-version = "0.1.12"
+version = "0.1.13"
 description = "Python client for creating new Zeno projects and uploading data."
 authors = ["Zeno Team <hello@zenoml.com>"]
 license = "MIT"
@@ -14,7 +14,8 @@ python = ">=3.8"
 pydantic = ">=1.0"
 requests = ">=2.20.0"
 arrow-json = "^0.9.0"
-outdated = "^0.2.2"
+outdated = ">=0.2.0"
+tqdm = ">=4.1.0"
 
 [tool.poetry.dev-dependencies]
 pyright = "^1.1.320"
