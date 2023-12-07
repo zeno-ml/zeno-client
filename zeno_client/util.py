@@ -33,17 +33,17 @@ def df_to_pa(df: pd.DataFrame, id_column: str) -> pa.Table:
 
         if pa.types.is_struct(col_type):
             new_column = array_to_utf8_json_array(data)
+        elif pa.types.is_list(col_type):
+            if pa.types.is_integer(col_type.value_type) or pa.types.is_floating(
+                col_type.value_type
+            ):
+                new_column = data
+            else:
+                new_column = array_to_utf8_json_array(data)
         elif (
             pa.types.is_integer(col_type)
             or pa.types.is_floating(col_type)
             or pa.types.is_boolean(col_type)
-            or (
-                pa.types.is_list(col_type)
-                and (
-                    pa.types.is_integer(col_type.value_type)
-                    or pa.types.is_floating(col_type.value_type)
-                )
-            )
         ):
             new_column = data
         else:
