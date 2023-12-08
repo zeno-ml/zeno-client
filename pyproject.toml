@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "zeno-client"
-version = "0.1.13"
+version = "0.1.14"
 description = "Python client for creating new Zeno projects and uploading data."
 authors = ["Zeno Team <hello@zenoml.com>"]
 license = "MIT"
