@@ -305,10 +305,10 @@ class ZenoClient:
         *,
         name: str,
         view: Union[str, Dict] = "",
-        description: str = "",
+        description: str | None = None,
         metrics: List[ZenoMetric] = [],
-        samples_per_page: int = 30,
-        public: bool = False,
+        samples_per_page: int | None = None,
+        public: bool | None = None,
     ) -> ZenoProject:
         """Creates an empty project in Zeno's backend.
 
@@ -321,8 +321,9 @@ class ZenoClient:
             metrics (list[ZenoMetric], optional): The metrics to calculate for the
                 project. Defaults to [].
             samples_per_page (int, optional): The number of samples to show per page.
-                Defaults to 30.
-            public (bool, optional): Whether the project is public. Defaults to False.
+                Defaults to None.
+            public (bool | None, optional): Whether the project is public.
+                Defaults to None.
 
         Returns:
             ZenoProject | None: The created project object or None if the project could
