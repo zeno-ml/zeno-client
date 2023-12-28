@@ -398,7 +398,7 @@ class ZenoClient:
         user = quote(owner_name, safe="!~*'()")
         project = quote(project_name, safe="!~*'()")
         response = requests.get(
-            f"{self.endpoint}/api/project-uuid/{user}/{project}",
+            f"{self.endpoint}/api/project-by-name/{user}/{project}",
             headers={"Authorization": "Bearer " + self.api_key},
             verify=True,
         )
