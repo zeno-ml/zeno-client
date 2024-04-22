@@ -1,4 +1,5 @@
 """Functions to upload data to Zeno's backend."""
+
 import io
 import json
 import re
@@ -305,10 +306,10 @@ class ZenoClient:
         *,
         name: str,
         view: Union[str, Dict] = "",
-        description: str | None = None,
+        description: Optional[str] = None,
         metrics: List[ZenoMetric] = [],
-        samples_per_page: int | None = None,
-        public: bool | None = None,
+        samples_per_page: Optional[int] = None,
+        public: Optional[bool] = None,
     ) -> ZenoProject:
         """Creates an empty project in Zeno's backend.
 
